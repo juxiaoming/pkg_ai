@@ -43,15 +43,17 @@ func (m *MoonshotServer) RequestPath(model string) string {
 type MoonshotRequestBody struct {
 	Messages         []Message `json:"messages"`
 	Model            string    `json:"model"`
-	MaxTokens        int64     `json:"max_tokens"`
-	Temperature      float64   `json:"temperature"`
-	TopP             float64   `json:"top_p"`
-	N                int64     `json:"n"`
-	PresencePenalty  float64   `json:"presence_penalty"`
-	FrequencyPenalty float64   `json:"frequency_penalty"`
-	ResponseFormat   string    `json:"response_format"`
-	Stop             []string  `json:"stop"`
-	Stream           bool      `json:"stream"`
+	MaxTokens        int64     `json:"max_tokens,omitempty"`
+	Temperature      float64   `json:"temperature,omitempty"`
+	TopP             float64   `json:"top_p,omitempty"`
+	N                int64     `json:"n,omitempty"`
+	PresencePenalty  float64   `json:"presence_penalty,omitempty"`
+	FrequencyPenalty float64   `json:"frequency_penalty,omitempty"`
+	ResponseFormat   struct {
+		Type string `json:"type"`
+	} `json:"response_format,omitempty"`
+	Stop   []string `json:"stop,omitempty"`
+	Stream bool     `json:"stream"`
 }
 
 func (m *MoonshotServer) build(data RequestData, isStream bool) ([]byte, error) {
@@ -59,10 +61,18 @@ func (m *MoonshotServer) build(data RequestData, isStream bool) ([]byte, error) 
 		return []byte{}, errors.New("问题、模型为必传字段")
 	}
 
-	request := &MoonshotRequestBody{Stream: isStream, Messages: make([]Message, 0), Stop: make([]string, 0)}
+	request := &MoonshotRequestBody{Stream: isStream, Messages: make([]Message, 0), Stop: make([]string, 0), ResponseFormat: struct {
+		Type string `json:"type"`
+	}(struct{ Type string }{Type: "text"})}
 
 	if err := copier.Copy(request, &data); err != nil {
 		return nil, err
+	}
+
+	if data.ResponseFormat == "json" {
+		request.ResponseFormat = struct {
+			Type string `json:"type"`
+		}(struct{ Type string }{Type: "json_object"})
 	}
 
 	if data.SystemQuery != "" {
