@@ -8,6 +8,7 @@ var (
 )
 
 type Config struct {
+	MoonshotUrl string `json:"moonshot_url"`
 	MoonshotKey string `json:"moonshot_key"`
 }
 
@@ -39,7 +40,7 @@ type Ability interface {
 	Chat(requestPath string, data []byte) (*Response, error)
 	ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error)
 	Supplier() string
-	RequestPath(model string) (string, error)
+	RequestPath() string
 }
 
 func Init(conf *Config) {
@@ -69,7 +70,7 @@ func NewServer(implementId int8) (*Server, error) {
 			return nil, errors.New("缺失配置")
 		}
 
-		client = newMoonshotServer(config.MoonshotKey)
+		client = newMoonshotServer(config.MoonshotUrl, config.MoonshotKey)
 	default:
 		return nil, errors.New("未定义实现")
 	}
@@ -84,12 +85,7 @@ func (s *Server) Chat(data RequestData) (*Response, error) {
 		return nil, err
 	}
 
-	requestPath, err := s.client.RequestPath(data.Model)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Chat(requestPath, payload)
+	return s.client.Chat(s.client.RequestPath(), payload)
 }
 
 // ChatStream 流式对话
@@ -99,10 +95,5 @@ func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan er
 		return nil, err
 	}
 
-	requestPath, err := s.client.RequestPath(data.Model)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.ChatStream(requestPath, payload, msgCh, errChan, stopChan)
+	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan, stopChan)
 }

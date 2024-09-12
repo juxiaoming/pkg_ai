@@ -15,20 +15,24 @@ import (
  */
 
 type MoonshotConf struct {
+	Url string `json:"url"`
 	Key string `json:"key"`
 }
 
-func NewMoonshotConf(key string) *Config {
-	return &Config{MoonshotKey: key}
+func NewMoonshotConf(url, key string) *Config {
+	return &Config{MoonshotUrl: url, MoonshotKey: key}
 }
 
 type MoonshotServer struct {
 	Conf MoonshotConf `json:"conf"`
 }
 
-func newMoonshotServer(key string) *MoonshotServer {
+func newMoonshotServer(url, key string) *MoonshotServer {
 	return &MoonshotServer{
-		Conf: MoonshotConf{Key: key},
+		Conf: MoonshotConf{
+			Url: url,
+			Key: key,
+		},
 	}
 }
 
@@ -36,8 +40,8 @@ func (m *MoonshotServer) Supplier() string {
 	return "moonshot"
 }
 
-func (m *MoonshotServer) RequestPath(model string) (string, error) {
-	return "https://api.moonshot.cn/v1/chat/completions", nil
+func (m *MoonshotServer) RequestPath() string {
+	return m.Conf.Url
 }
 
 type MoonshotRequestBody struct {
