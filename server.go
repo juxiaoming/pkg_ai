@@ -10,21 +10,24 @@ var (
 type Config struct {
 	MoonshotUrl string `json:"moonshot_url"`
 	MoonshotKey string `json:"moonshot_key"`
+	MinimaxiUrl string `json:"minimaxi_url"`
+	MinimaxiKey string `json:"minimaxi_key"`
 }
 
 type RequestData struct {
-	Model            string      `json:"model"`                       // Model ID
-	UserQuery        string      `json:"user_query"`                  // 用户提示词
-	SystemQuery      string      `json:"system_query,omitempty"`      // 系统提示词
-	History          [][2]string `json:"history,omitempty"`           // 历史对话
-	MaxTokens        int64       `json:"max_tokens,omitempty"`        // 聊天完成时生成的最大 token 数
-	Temperature      float64     `json:"temperature,omitempty"`       // 使用什么采样温度
-	TopP             float64     `json:"top_p,omitempty"`             // 另一种采样方法
-	N                int64       `json:"n,omitempty"`                 // 为每条输入消息生成多少个结果
-	PresencePenalty  float64     `json:"presence_penalty,omitempty"`  // 存在惩罚
-	FrequencyPenalty float64     `json:"frequency_penalty,omitempty"` // 频率惩罚
-	ResponseFormat   string      `json:"response_format,omitempty"`   // 响应格式【text 、 json_object】
-	Stop             []string    `json:"stop,omitempty"`              // 停止词
+	Model             string      `json:"model"`                         // Model ID
+	UserQuery         string      `json:"user_query"`                    // 用户提示词
+	SystemQuery       string      `json:"system_query,omitempty"`        // 系统提示词
+	History           [][2]string `json:"history,omitempty"`             // 历史对话
+	MaxTokens         int64       `json:"max_tokens,omitempty"`          // 聊天完成时生成的最大 token 数
+	Temperature       float64     `json:"temperature,omitempty"`         // 使用什么采样温度
+	TopP              float64     `json:"top_p,omitempty"`               // 另一种采样方法
+	N                 int64       `json:"n,omitempty"`                   // 为每条输入消息生成多少个结果
+	PresencePenalty   float64     `json:"presence_penalty,omitempty"`    // 存在惩罚
+	FrequencyPenalty  float64     `json:"frequency_penalty,omitempty"`   // 频率惩罚
+	ResponseFormat    string      `json:"response_format,omitempty"`     // 响应格式【text 、 json_object】
+	Stop              []string    `json:"stop,omitempty"`                // 停止词
+	MaskSensitiveInfo bool        `json:"mask_sensitive_info,omitempty"` // 对输出中易涉及隐私问题的文本信息进行打码
 }
 
 type Response struct {
@@ -55,6 +58,7 @@ type Server struct {
 
 const (
 	ImplementMoonshot int8 = 1 // 月之暗面
+	ImplementMinimaxi int8 = 2 // Minimaxi
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -66,11 +70,17 @@ func NewServer(implementId int8) (*Server, error) {
 
 	switch implementId {
 	case ImplementMoonshot:
-		if len(config.MoonshotKey) == 0 {
+		if len(config.MoonshotKey) == 0 || len(config.MoonshotUrl) == 0 {
 			return nil, errors.New("缺失配置")
 		}
 
 		client = newMoonshotServer(config.MoonshotUrl, config.MoonshotKey)
+	case ImplementMinimaxi:
+		if len(config.MinimaxiUrl) == 0 || len(config.MinimaxiKey) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newMinimaxiServer(config.MinimaxiUrl, config.MinimaxiKey)
 	default:
 		return nil, errors.New("未定义实现")
 	}
