@@ -247,7 +247,7 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			continue
 		}
 		ret.ResponseText += retStruct.Choices[0].Message.Content
-		fmt.Println("11111111111111111111111111111111111111111111111111")
+		fmt.Println("11111111111111111111111111111111111111111111111111", retStruct.Choices[0].Message.Content)
 		msgCh <- retStruct.Choices[0].Message.Content
 
 		if retStruct.Usage.TotalTokens > 0 {
