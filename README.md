@@ -7,7 +7,7 @@ go get github.com/juxiaoming/pkg_ai
 
 ### 支持第三方登录
 <table>
-    <tr><th>三方</th><th>参考文档</th><th>应用申请（已登录）</th></tr>
+    <tr><th>三方</th><th>参考文档</th><th>应用申请</th></tr>
     <tr>
         <td><img src="https://platform.moonshot.cn/logo.png" height="30" title="月之暗面"></td>
         <td><a target="_blank" href="https://platform.moonshot.cn/docs/api/chat#%E5%AD%97%E6%AE%B5%E8%AF%B4%E6%98%8E">参考文档</a></td>
