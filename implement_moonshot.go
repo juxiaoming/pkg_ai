@@ -131,7 +131,7 @@ func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error
 	}
 
 	retStruct := MoonshotChatResponse{}
-	if err := json.Unmarshal(retBytes, &ret); err != nil {
+	if err := json.Unmarshal(retBytes, &retStruct); err != nil {
 		return ret, err
 	}
 
