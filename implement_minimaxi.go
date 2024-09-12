@@ -225,11 +225,11 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			continue
 		}
 
-		headerData := []byte("data: ")
-		if !bytes.HasPrefix(line, headerData) {
-			continue
-		}
-		line = bytes.TrimPrefix(line, headerData)
+		//headerData := []byte("data: ")
+		//if !bytes.HasPrefix(line, headerData) {
+		//	continue
+		//}
+		//line = bytes.TrimPrefix(line, headerData)
 
 		retStruct := MinimaxiStreamResp{}
 		if err := json.Unmarshal(line, &retStruct); err != nil {
