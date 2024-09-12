@@ -200,7 +200,7 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 	reader := bufio.NewReader(response.Body)
 
 	for {
-		line, err := reader.ReadBytes('\n')
+		line, _, err := reader.ReadLine()
 		ret.ResponseData = append(ret.ResponseData, line...)
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
