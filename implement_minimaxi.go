@@ -160,12 +160,17 @@ type MinimaxiStreamResp struct {
 		FinishReason string `json:"finish_reason"`
 		Index        int    `json:"index"`
 		Message      struct {
-			Delta        string `json:"delta"`
 			Content      string `json:"content"`
 			Role         string `json:"role"`
 			Name         string `json:"name"`
 			AudioContent string `json:"audio_content"`
 		} `json:"message"`
+		Delta struct {
+			Content      string `json:"content"`
+			Role         string `json:"role"`
+			Name         string `json:"name"`
+			AudioContent string `json:"audio_content"`
+		} `json:"delta"`
 	} `json:"choices"`
 	Created int    `json:"created"`
 	Model   string `json:"model"`
@@ -247,8 +252,8 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			continue
 		}
 
-		ret.ResponseText += retStruct.Choices[0].Message.Delta + retStruct.Choices[0].Message.Content
-		msgCh <- retStruct.Choices[0].Message.Delta + retStruct.Choices[0].Message.Content
+		ret.ResponseText += retStruct.Choices[0].Delta.Content + retStruct.Choices[0].Message.Content
+		msgCh <- retStruct.Choices[0].Delta.Content + retStruct.Choices[0].Message.Content
 
 		if retStruct.Usage.TotalTokens > 0 {
 			ret.CompletionTokens = retStruct.Usage.TotalTokens
