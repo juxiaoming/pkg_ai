@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/jinzhu/copier"
 	"io"
 )
@@ -225,11 +226,11 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			continue
 		}
 
-		//headerData := []byte("data: ")
-		//if !bytes.HasPrefix(line, headerData) {
-		//	continue
-		//}
-		//line = bytes.TrimPrefix(line, headerData)
+		headerData := []byte("data: ")
+		if !bytes.HasPrefix(line, headerData) {
+			continue
+		}
+		line = bytes.TrimPrefix(line, headerData)
 
 		retStruct := MinimaxiStreamResp{}
 		if err := json.Unmarshal(line, &retStruct); err != nil {
@@ -246,6 +247,7 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			continue
 		}
 		ret.ResponseText += retStruct.Choices[0].Message.Content
+		fmt.Println("11111111111111111111111111111111111111111111111111")
 		msgCh <- retStruct.Choices[0].Message.Content
 
 		if retStruct.Usage.TotalTokens > 0 {
