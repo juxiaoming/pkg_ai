@@ -3,11 +3,10 @@ package pkg_ai
 import (
 	"net/http"
 	"strings"
-	"time"
 )
 
 func postBase(url string, payload string, headers map[string]string) (resp *http.Response, err error) {
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, strings.NewReader(payload))
 	if err != nil {
 		return
@@ -20,7 +19,7 @@ func postBase(url string, payload string, headers map[string]string) (resp *http
 }
 
 func getBase(requestUrl string, headers map[string]string) (resp *http.Response, err error) {
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{}
 	req, err := http.NewRequest("GET", requestUrl, nil)
 	if err != nil {
 		return
