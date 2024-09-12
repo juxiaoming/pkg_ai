@@ -39,7 +39,7 @@ type Ability interface {
 	Chat(requestPath string, data []byte) (*Response, error)
 	ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error)
 	Supplier() string
-	RequestPath(model string) string
+	RequestPath(model string) (string, error)
 }
 
 func Init(conf *Config) {
@@ -84,7 +84,10 @@ func (s *Server) Chat(data RequestData) (*Response, error) {
 		return nil, err
 	}
 
-	requestPath := s.client.RequestPath(data.Model)
+	requestPath, err := s.client.RequestPath(data.Model)
+	if err != nil {
+		return nil, err
+	}
 
 	return s.client.Chat(requestPath, payload)
 }
@@ -96,7 +99,10 @@ func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan er
 		return nil, err
 	}
 
-	requestPath := s.client.RequestPath(data.Model)
+	requestPath, err := s.client.RequestPath(data.Model)
+	if err != nil {
+		return nil, err
+	}
 
 	return s.client.ChatStream(requestPath, payload, msgCh, errChan, stopChan)
 }

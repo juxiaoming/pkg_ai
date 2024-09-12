@@ -36,8 +36,8 @@ func (m *MoonshotServer) Supplier() string {
 	return "moonshot"
 }
 
-func (m *MoonshotServer) RequestPath(model string) string {
-	return "https://api.moonshot.cn/v1/chat/completions"
+func (m *MoonshotServer) RequestPath(model string) (string, error) {
+	return "https://api.moonshot.cn/v1/chat/completions", nil
 }
 
 type MoonshotRequestBody struct {
