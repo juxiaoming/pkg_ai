@@ -200,7 +200,7 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 
 		if err != nil {
 
-			if !errors.Is(err, io.EOF) {
+			if errors.Is(err, io.EOF) {
 				resErr := err
 				errStruct := &MoonshotErrorInfo{}
 				if err := json.Unmarshal(line, errStruct); err == nil {
@@ -211,7 +211,7 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 				return ret, resErr
 			}
 
-			close(msgCh)
+			errChan <- err
 			return ret, err
 		}
 
