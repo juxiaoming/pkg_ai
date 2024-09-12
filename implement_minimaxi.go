@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/jinzhu/copier"
 	"io"
 )
@@ -161,6 +160,7 @@ type MinimaxiStreamResp struct {
 		FinishReason string `json:"finish_reason"`
 		Index        int    `json:"index"`
 		Message      struct {
+			Delta        string `json:"delta"`
 			Content      string `json:"content"`
 			Role         string `json:"role"`
 			Name         string `json:"name"`
@@ -246,9 +246,9 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 		if len(retStruct.Choices) == 0 {
 			continue
 		}
-		ret.ResponseText += retStruct.Choices[0].Message.Content
-		fmt.Println("11111111111111111111111111111111111111111111111111", retStruct.Choices[0].Message.Content)
-		msgCh <- retStruct.Choices[0].Message.Content
+
+		ret.ResponseText += retStruct.Choices[0].Message.Delta + retStruct.Choices[0].Message.Content
+		msgCh <- retStruct.Choices[0].Message.Delta + retStruct.Choices[0].Message.Content
 
 		if retStruct.Usage.TotalTokens > 0 {
 			ret.CompletionTokens = retStruct.Usage.TotalTokens
