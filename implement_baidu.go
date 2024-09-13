@@ -8,6 +8,8 @@ import (
 	"github.com/jinzhu/copier"
 	"io"
 	"net/url"
+	"sync"
+	"time"
 )
 
 /**
@@ -16,6 +18,12 @@ import (
  */
 
 const BaiDuTokenUrl = "https://aip.baidubce.com/oauth/2.0/token"
+
+var (
+	BaiDuToken    string = ""
+	BaiDuTokenExp int64  = 0
+	BaiDuLock     sync.Mutex
+)
 
 type BaiDuConf struct {
 	Url          string `json:"url"`
@@ -93,7 +101,7 @@ type BaiDuTokenResponse struct {
 	Error            string `json:"error"`
 }
 
-func (b *BaiDuServer) Token() (string, error) {
+func (b *BaiDuServer) token() (string, error) {
 	formData := url.Values{}
 	formData.Set("grant_type", "client_credentials")
 	formData.Set("client_id", b.Conf.ClientId)
@@ -118,6 +126,24 @@ func (b *BaiDuServer) Token() (string, error) {
 	}
 
 	return responseStruct.AccessToken, nil
+}
+
+func (b *BaiDuServer) Token() (string, error) {
+	BaiDuLock.Lock()
+	defer BaiDuLock.Unlock()
+
+	if time.Now().Unix() < BaiDuTokenExp {
+		return BaiDuToken, nil
+	}
+
+	token, err := b.token()
+	if err != nil {
+		return token, err
+	}
+	BaiDuTokenExp = time.Now().Unix() + 86400*30 - 7200
+	BaiDuToken = token
+
+	return token, nil
 }
 
 type BaiDuResponse struct {
