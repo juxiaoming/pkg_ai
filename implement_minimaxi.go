@@ -251,9 +251,14 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 		if len(retStruct.Choices) == 0 {
 			continue
 		}
+		if len(retStruct.Choices[0].Delta.Content) > 0 {
+			ret.ResponseText += retStruct.Choices[0].Delta.Content
+			msgCh <- retStruct.Choices[0].Delta.Content
+		}
 
-		ret.ResponseText += retStruct.Choices[0].Delta.Content + retStruct.Choices[0].Message.Content
-		msgCh <- retStruct.Choices[0].Delta.Content + retStruct.Choices[0].Message.Content
+		if len(retStruct.Choices[0].Message.Content) > 0 {
+			ret.ResponseText = retStruct.Choices[0].Message.Content
+		}
 
 		if retStruct.Usage.TotalTokens > 0 {
 			ret.CompletionTokens = retStruct.Usage.TotalTokens
