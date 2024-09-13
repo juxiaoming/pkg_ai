@@ -45,13 +45,13 @@ func (q *QwenServer) RequestPath() string {
 }
 
 type QwenRequestBody struct {
-	Messages      []Message     `json:"messages"`
-	Model         string        `json:"model"`
-	MaxTokens     int64         `json:"max_tokens,omitempty"`
-	Temperature   float64       `json:"temperature,omitempty"`
-	TopP          float64       `json:"top_p,omitempty"`
-	StreamOptions StreamOptions `json:"stream_options,omitempty"`
-	Stream        bool          `json:"stream"`
+	Messages      []Message      `json:"messages"`
+	Model         string         `json:"model"`
+	MaxTokens     int64          `json:"max_tokens,omitempty"`
+	Temperature   float64        `json:"temperature,omitempty"`
+	TopP          float64        `json:"top_p,omitempty"`
+	StreamOptions *StreamOptions `json:"stream_options,omitempty"`
+	Stream        bool           `json:"stream"`
 }
 
 func (q *QwenServer) build(data RequestData, isStream bool) ([]byte, error) {
@@ -76,7 +76,7 @@ func (q *QwenServer) build(data RequestData, isStream bool) ([]byte, error) {
 	}
 	request.Messages = append(request.Messages, Message{Role: MessageUSer, Content: data.UserQuery})
 	if isStream {
-		request.StreamOptions = StreamOptions{IncludeUsage: true}
+		request.StreamOptions = &StreamOptions{IncludeUsage: true}
 	}
 
 	return json.Marshal(request)
