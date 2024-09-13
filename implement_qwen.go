@@ -110,7 +110,7 @@ type QwenChatResponse struct {
 
 func (q *QwenServer) Chat(requestPath string, data []byte) (*Response, error) {
 	ret := &Response{RequestData: data}
-	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key}
+	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key, "Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
