@@ -18,6 +18,11 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://platform.minimaxi.com/document/ChatCompletion%20v2?key=66701d281d57f38758d581d0">参考文档</a></td>
         <td><a target="_blank" href="https://platform.minimaxi.com/user-center/basic-information/interface-key">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="https://portal.volccdn.com/obj/volcfe/logo/appbar_logo_dark.2.svg" height="30" title="volc"></td>
+        <td><a target="_blank" href="https://www.volcengine.com/docs/82379/1298454">参考文档</a></td>
+        <td><a target="_blank" href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
