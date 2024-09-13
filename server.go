@@ -12,6 +12,8 @@ type Config struct {
 	MoonshotKey string `json:"moonshot_key"`
 	MinimaxiUrl string `json:"minimaxi_url"`
 	MinimaxiKey string `json:"minimaxi_key"`
+	VolcUrl     string `json:"volc_url"`
+	VolcKey     string `json:"volc_key"`
 }
 
 type RequestData struct {
@@ -59,6 +61,7 @@ type Server struct {
 const (
 	ImplementMoonshot int8 = 1 // 月之暗面
 	ImplementMinimaxi int8 = 2 // Minimaxi
+	ImplementVolc     int8 = 3 // Volc
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -81,6 +84,12 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newMinimaxiServer(config.MinimaxiUrl, config.MinimaxiKey)
+	case ImplementVolc:
+		if len(config.VolcUrl) == 0 || len(config.VolcKey) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newVolcServer(config.VolcUrl, config.VolcKey)
 	default:
 		return nil, errors.New("未定义实现")
 	}
