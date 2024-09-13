@@ -142,7 +142,7 @@ func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
-	if retStruct.Error.Message != "" {
+	if len(retStruct.Error.Message) > 0 {
 		return ret, errors.New(retStruct.Error.Message)
 	}
 

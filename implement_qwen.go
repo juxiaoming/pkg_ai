@@ -10,57 +10,56 @@ import (
 )
 
 /**
- * 【抖音豆包】volcengine
- * Doc : https://www.volcengine.com/docs/82379/1298454
+ * 【通义千问】qwen
+ * Doc : https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen
  */
 
-type VolcConf struct {
+type QwenConf struct {
 	Url string `json:"url"`
 	Key string `json:"key"`
 }
 
-func NewVolcConf(url, key string) *Config {
-	return &Config{VolcUrl: url, VolcKey: key}
+func NewQwenConf(url, key string) *Config {
+	return &Config{QwenUrl: url, QwenKey: key}
 }
 
-type VolcServer struct {
-	Conf VolcConf `json:"conf"`
+type QwenServer struct {
+	Conf QwenConf `json:"conf"`
 }
 
-func newVolcServer(url, key string) *VolcServer {
-	return &VolcServer{
-		Conf: VolcConf{
+func newQwenServer(url, key string) *QwenServer {
+	return &QwenServer{
+		Conf: QwenConf{
 			Url: url,
 			Key: key,
 		},
 	}
 }
 
-func (m *VolcServer) Supplier() string {
-	return "volc"
+func (q *QwenServer) Supplier() string {
+	return "qwen"
 }
 
-func (m *VolcServer) RequestPath() string {
-	return m.Conf.Url
+func (q *QwenServer) RequestPath() string {
+	return q.Conf.Url
 }
 
-type VolcRequestBody struct {
+type QwenRequestBody struct {
 	Messages      []Message     `json:"messages"`
 	Model         string        `json:"model"`
 	MaxTokens     int64         `json:"max_tokens,omitempty"`
 	Temperature   float64       `json:"temperature,omitempty"`
 	TopP          float64       `json:"top_p,omitempty"`
-	Stop          []string      `json:"stop,omitempty"`
-	Stream        bool          `json:"stream"`
 	StreamOptions StreamOptions `json:"stream_options,omitempty"`
+	Stream        bool          `json:"stream"`
 }
 
-func (m *VolcServer) build(data RequestData, isStream bool) ([]byte, error) {
+func (q *QwenServer) build(data RequestData, isStream bool) ([]byte, error) {
 	if data.UserQuery == "" || data.Model == "" {
 		return []byte{}, errors.New("问题、模型为必传字段")
 	}
 
-	request := &VolcRequestBody{Stream: isStream, Messages: make([]Message, 0), Stop: make([]string, 0)}
+	request := &QwenRequestBody{Stream: isStream, Messages: make([]Message, 0)}
 
 	if err := copier.Copy(request, &data); err != nil {
 		return nil, err
@@ -83,35 +82,35 @@ func (m *VolcServer) build(data RequestData, isStream bool) ([]byte, error) {
 	return json.Marshal(request)
 }
 
-type VolcChatResponse struct {
+type QwenChatResponse struct {
 	Choices []struct {
-		FinishReason string `json:"finish_reason"`
-		Index        int64  `json:"index"`
-		Message      struct {
-			Content string `json:"content"`
+		Message struct {
 			Role    string `json:"role"`
+			Content string `json:"content"`
 		} `json:"message"`
+		FinishReason string      `json:"finish_reason"`
+		Index        int64       `json:"index"`
+		Logprobs     interface{} `json:"logprobs"`
 	} `json:"choices"`
-	Created int    `json:"created"`
-	Id      string `json:"id"`
-	Model   string `json:"model"`
-	Object  string `json:"object"`
-	Usage   struct {
-		CompletionTokens int64 `json:"completion_tokens"`
+	Object string `json:"object"`
+	Usage  struct {
 		PromptTokens     int64 `json:"prompt_tokens"`
+		CompletionTokens int64 `json:"completion_tokens"`
 		TotalTokens      int64 `json:"total_tokens"`
 	} `json:"usage"`
-	Error struct {
-		Code    string `json:"code"`
+	Created           int64       `json:"created"`
+	SystemFingerprint interface{} `json:"system_fingerprint"`
+	Model             string      `json:"model"`
+	Id                string      `json:"id"`
+	Error             struct {
 		Message string `json:"message"`
-		Param   string `json:"param"`
 		Type    string `json:"type"`
 	} `json:"error"`
 }
 
-func (m *VolcServer) Chat(requestPath string, data []byte) (*Response, error) {
+func (q *QwenServer) Chat(requestPath string, data []byte) (*Response, error) {
 	ret := &Response{RequestData: data}
-	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -126,7 +125,7 @@ func (m *VolcServer) Chat(requestPath string, data []byte) (*Response, error) {
 		return ret, err
 	}
 
-	retStruct := VolcChatResponse{}
+	retStruct := QwenChatResponse{}
 	if err := json.Unmarshal(retBytes, &retStruct); err != nil {
 		return ret, err
 	}
@@ -134,7 +133,7 @@ func (m *VolcServer) Chat(requestPath string, data []byte) (*Response, error) {
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
-	if len(retStruct.Error.Code) > 0 {
+	if len(retStruct.Error.Message) > 0 {
 		return ret, errors.New(retStruct.Error.Message)
 	}
 
@@ -147,45 +146,42 @@ func (m *VolcServer) Chat(requestPath string, data []byte) (*Response, error) {
 	return ret, nil
 }
 
-type VolcStreamResp struct {
+type QwenResponse struct {
 	Choices []struct {
-		Delta struct {
-			Content string `json:"content"`
-			Role    string `json:"role"`
-		} `json:"delta"`
 		FinishReason string `json:"finish_reason"`
-		Index        int    `json:"index"`
+		Delta        struct {
+			Content string `json:"content"`
+		} `json:"delta"`
+		Index    int64       `json:"index"`
+		Logprobs interface{} `json:"logprobs"`
 	} `json:"choices"`
-	Created int64  `json:"created"`
-	Id      string `json:"id"`
-	Model   string `json:"model"`
-	Object  string `json:"object"`
-	Usage   struct {
-		CompletionTokens int64 `json:"completion_tokens"`
+	Object string `json:"object"`
+	Usage  struct {
 		PromptTokens     int64 `json:"prompt_tokens"`
+		CompletionTokens int64 `json:"completion_tokens"`
 		TotalTokens      int64 `json:"total_tokens"`
 	} `json:"usage"`
-	Error struct {
-		Code    string `json:"code"`
+	Created           int64       `json:"created"`
+	SystemFingerprint interface{} `json:"system_fingerprint"`
+	Model             string      `json:"model"`
+	Id                string      `json:"id"`
+	Error             struct {
 		Message string `json:"message"`
-		Param   string `json:"param"`
 		Type    string `json:"type"`
 	} `json:"error"`
 }
 
-type VolcErrorInfo struct {
+type QwenErrorInfo struct {
 	Error struct {
-		Code    string `json:"code"`
 		Message string `json:"message"`
-		Param   string `json:"param"`
 		Type    string `json:"type"`
 	} `json:"error"`
 }
 
-func (m *VolcServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error) {
+func (q *QwenServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error) {
 	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
 
-	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key, "Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err
@@ -206,7 +202,7 @@ func (m *VolcServer) ChatStream(requestPath string, data []byte, msgCh chan stri
 
 			if errors.Is(err, io.EOF) {
 				resErr := err
-				errStruct := &VolcErrorInfo{}
+				errStruct := &QwenErrorInfo{}
 				if err := json.Unmarshal(line, errStruct); err == nil {
 					resErr = errors.New(errStruct.Error.Message)
 				}
@@ -234,11 +230,12 @@ func (m *VolcServer) ChatStream(requestPath string, data []byte, msgCh chan stri
 			break
 		}
 
-		retStruct := VolcStreamResp{}
+		retStruct := QwenResponse{}
 		if err := json.Unmarshal(line, &retStruct); err != nil {
 			errChan <- err
 			return ret, err
 		}
+
 		if len(retStruct.Error.Message) > 0 {
 			err := errors.New(retStruct.Error.Message)
 			errChan <- err
@@ -253,6 +250,7 @@ func (m *VolcServer) ChatStream(requestPath string, data []byte, msgCh chan stri
 		if len(retStruct.Choices) == 0 {
 			continue
 		}
+
 		ret.ResponseText += retStruct.Choices[0].Delta.Content
 		msgCh <- retStruct.Choices[0].Delta.Content
 	}
