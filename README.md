@@ -24,7 +24,7 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://bce.bdstatic.com/img/favicon.ico" height="30" title="文心一言"></td>
+        <td><img src="https://nlp-eb.cdn.bcebos.com/static/eb/asset/logo.8a6b508d.png" height="30" title="文心一言"><img src="https://nlp-eb.cdn.bcebos.com/static/eb/asset/logo-name.7e54ad31.png" height="18" title="文心一言"></td>
         <td><a target="_blank" href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t#http%E8%B0%83%E7%94%A8">参考文档</a></td>
         <td><a target="_blank" href="https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1">应用申请</a></td>
     </tr>
