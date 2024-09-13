@@ -45,14 +45,14 @@ func (m *VolcServer) RequestPath() string {
 }
 
 type VolcRequestBody struct {
-	Messages      []Message     `json:"messages"`
-	Model         string        `json:"model"`
-	MaxTokens     int64         `json:"max_tokens,omitempty"`
-	Temperature   float64       `json:"temperature,omitempty"`
-	TopP          float64       `json:"top_p,omitempty"`
-	Stop          []string      `json:"stop,omitempty"`
-	Stream        bool          `json:"stream"`
-	StreamOptions StreamOptions `json:"stream_options,omitempty"`
+	Messages      []Message      `json:"messages"`
+	Model         string         `json:"model"`
+	MaxTokens     int64          `json:"max_tokens,omitempty"`
+	Temperature   float64        `json:"temperature,omitempty"`
+	TopP          float64        `json:"top_p,omitempty"`
+	Stop          []string       `json:"stop,omitempty"`
+	Stream        bool           `json:"stream"`
+	StreamOptions *StreamOptions `json:"stream_options,omitempty"`
 }
 
 func (m *VolcServer) build(data RequestData, isStream bool) ([]byte, error) {
@@ -77,7 +77,7 @@ func (m *VolcServer) build(data RequestData, isStream bool) ([]byte, error) {
 	}
 	request.Messages = append(request.Messages, Message{Role: MessageUSer, Content: data.UserQuery})
 	if isStream {
-		request.StreamOptions = StreamOptions{IncludeUsage: true}
+		request.StreamOptions = &StreamOptions{IncludeUsage: true}
 	}
 
 	return json.Marshal(request)
