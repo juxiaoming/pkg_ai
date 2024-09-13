@@ -23,6 +23,11 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://www.volcengine.com/docs/82379/1298454">参考文档</a></td>
         <td><a target="_blank" href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="https://bce.bdstatic.com/img/favicon.ico" height="30" title="文心一言"></td>
+        <td><a target="_blank" href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t#http%E8%B0%83%E7%94%A8">参考文档</a></td>
+        <td><a target="_blank" href="https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
