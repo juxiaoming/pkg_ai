@@ -107,3 +107,13 @@ func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan er
 
 	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan, stopChan)
 }
+
+// CustomizeChat 自定义参数阻塞式对话, 用户自己实现请求的body参数
+func (s *Server) CustomizeChat(payload []byte) (*Response, error) {
+	return s.client.Chat(s.client.RequestPath(), payload)
+}
+
+// CustomizeChatStream 自定义参数流式对话, 用户自己实现请求的body参数
+func (s *Server) CustomizeChatStream(payload []byte, msgCh chan string, errChan chan error, stopChan chan struct{}) (*Response, error) {
+	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan, stopChan)
+}
