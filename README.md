@@ -23,7 +23,7 @@ go get github.com/juxiaoming/pkg_ai
 ### 使用
 ```go
 // 初始化配置
-pkg_ai.Init(pkg_ai.NewMoonshotConf("sk-your_key"))
+pkg_ai.Init(pkg_ai.NewMoonshotConf("request_url" , "sk-your_key"))
 
 // 初始化多服务配置
 pkg_ai.Init(&pkg_ai.Config{...})
@@ -47,6 +47,10 @@ fmt.Println(server.Chat(data))
 // 流式请求
 msgChan, errChan, stopChan := make(chan string, 10000), make(chan error), make(chan struct{})
 fmt.Println(server.ChatStream(data, msgChan, errChan, stopChan))
+
+// 自定义请求参数
+fmt.Println(server.CustomizeChat([]byte("{....}")))
+fmt.Println(server.CustomizeChatStream([]byte("{....}"), msgChan, errChan, stopChan))
 ```
 ### 建议
 建议初始化配置文件之后单次调用pkg_login.Init()方法注册服务配置
