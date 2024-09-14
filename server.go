@@ -22,6 +22,8 @@ type Config struct {
 	HunyuanUrl          string `json:"hunyuan_url"`
 	HunyuanClientId     string `json:"hunyuan_client_id"`
 	HunyuanClientSecret string `json:"hunyuan_client_secret"`
+	GlmUrl              string `json:"glm_url"`
+	GlmKey              string `json:"glm_key"`
 }
 
 type RequestData struct {
@@ -73,6 +75,7 @@ const (
 	ImplementBaidu    int8 = 4 // 百度
 	ImplementQwen     int8 = 5 // 通义千问
 	ImplementHunyuan  int8 = 6 // 混元大模型
+	ImplementGlm      int8 = 7 // 智谱清言
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -119,6 +122,12 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newHunyuanServer(config.HunyuanUrl, config.HunyuanClientId, config.HunyuanClientSecret)
+	case ImplementGlm:
+		if len(config.GlmUrl) == 0 || len(config.GlmKey) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newQwenServer(config.GlmUrl, config.GlmKey)
 	default:
 		return nil, errors.New("未定义实现")
 	}

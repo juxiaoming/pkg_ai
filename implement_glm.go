@@ -10,73 +10,58 @@ import (
 )
 
 /**
- * 【月之暗面】moonshot
- * Doc : https://platform.moonshot.cn/docs/api/chat#%E5%85%AC%E5%BC%80%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%9C%B0%E5%9D%80
+ * 【智谱清言】bigmodel
+ * Doc : https://open.bigmodel.cn/dev/api/normal-model/glm-4
  */
 
-type MoonshotConf struct {
+type GlmConf struct {
 	Url string `json:"url"`
 	Key string `json:"key"`
 }
 
-func NewMoonshotConf(url, key string) *Config {
-	return &Config{MoonshotUrl: url, MoonshotKey: key}
+func NewGlmConf(url, key string) *Config {
+	return &Config{GlmUrl: url, GlmKey: key}
 }
 
-type MoonshotServer struct {
-	Conf MoonshotConf `json:"conf"`
+type GlmServer struct {
+	Conf GlmConf `json:"conf"`
 }
 
-func newMoonshotServer(url, key string) *MoonshotServer {
-	return &MoonshotServer{
-		Conf: MoonshotConf{
+func newGlmServer(url, key string) *GlmServer {
+	return &GlmServer{
+		Conf: GlmConf{
 			Url: url,
 			Key: key,
 		},
 	}
 }
 
-func (m *MoonshotServer) Supplier() string {
-	return "moonshot"
+func (g *GlmServer) Supplier() string {
+	return "bigmodel"
 }
 
-func (m *MoonshotServer) RequestPath() string {
-	return m.Conf.Url
+func (g *GlmServer) RequestPath() string {
+	return g.Conf.Url
 }
 
-type MoonshotRequestBody struct {
-	Messages         []Message `json:"messages"`
-	Model            string    `json:"model"`
-	MaxTokens        int64     `json:"max_tokens,omitempty"`
-	Temperature      float64   `json:"temperature,omitempty"`
-	TopP             float64   `json:"top_p,omitempty"`
-	N                int64     `json:"n,omitempty"`
-	PresencePenalty  float64   `json:"presence_penalty,omitempty"`
-	FrequencyPenalty float64   `json:"frequency_penalty,omitempty"`
-	ResponseFormat   struct {
-		Type string `json:"type"`
-	} `json:"response_format,omitempty"`
-	Stop   []string `json:"stop,omitempty"`
-	Stream bool     `json:"stream"`
+type GlmRequestBody struct {
+	Messages    []Message `json:"messages"`
+	Model       string    `json:"model"`
+	MaxTokens   int64     `json:"max_tokens,omitempty"`
+	Temperature float64   `json:"temperature,omitempty"`
+	TopP        float64   `json:"top_p,omitempty"`
+	Stream      bool      `json:"stream"`
 }
 
-func (m *MoonshotServer) build(data RequestData, isStream bool) ([]byte, error) {
+func (g *GlmServer) build(data RequestData, isStream bool) ([]byte, error) {
 	if data.UserQuery == "" || data.Model == "" {
 		return []byte{}, errors.New("问题、模型为必传字段")
 	}
 
-	request := &MoonshotRequestBody{Stream: isStream, Messages: make([]Message, 0), Stop: make([]string, 0), ResponseFormat: struct {
-		Type string `json:"type"`
-	}(struct{ Type string }{Type: "text"})}
+	request := &GlmRequestBody{Stream: isStream, Messages: make([]Message, 0)}
 
 	if err := copier.Copy(request, &data); err != nil {
 		return nil, err
-	}
-
-	if data.ResponseFormat == "json" {
-		request.ResponseFormat = struct {
-			Type string `json:"type"`
-		}(struct{ Type string }{Type: "json_object"})
 	}
 
 	if data.SystemQuery != "" {
@@ -93,33 +78,33 @@ func (m *MoonshotServer) build(data RequestData, isStream bool) ([]byte, error) 
 	return json.Marshal(request)
 }
 
-type MoonshotChatResponse struct {
-	Id      string `json:"id"`
-	Object  string `json:"object"`
-	Created int    `json:"created"`
-	Model   string `json:"model"`
+type GlmChatResponse struct {
 	Choices []struct {
-		Index   int `json:"index"`
-		Message struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		} `json:"message"`
 		FinishReason string `json:"finish_reason"`
+		Index        int64  `json:"index"`
+		Message      struct {
+			Content string `json:"content"`
+			Role    string `json:"role"`
+		} `json:"message"`
 	} `json:"choices"`
-	Usage struct {
-		PromptTokens     int64 `json:"prompt_tokens"`
+	Created   int64  `json:"created"`
+	Id        string `json:"id"`
+	Model     string `json:"model"`
+	RequestId string `json:"request_id"`
+	Usage     struct {
 		CompletionTokens int64 `json:"completion_tokens"`
+		PromptTokens     int64 `json:"prompt_tokens"`
 		TotalTokens      int64 `json:"total_tokens"`
 	} `json:"usage"`
 	Error struct {
+		Code    string `json:"code"`
 		Message string `json:"message"`
-		Type    string `json:"type"`
 	} `json:"error"`
 }
 
-func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error) {
+func (g *GlmServer) Chat(requestPath string, data []byte) (*Response, error) {
 	ret := &Response{RequestData: data}
-	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	headers := map[string]string{"Authorization": "Bearer " + g.Conf.Key, "Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -134,7 +119,7 @@ func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error
 		return ret, err
 	}
 
-	retStruct := MoonshotChatResponse{}
+	retStruct := GlmChatResponse{}
 	if err := json.Unmarshal(retBytes, &retStruct); err != nil {
 		return ret, err
 	}
@@ -155,37 +140,40 @@ func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error
 	return ret, nil
 }
 
-type MoonshotErrorInfo struct {
+type GlmStreamResp struct {
+	Id      string `json:"id"`
+	Created int64  `json:"created"`
+	Model   string `json:"model"`
+	Choices []struct {
+		Index        int64  `json:"index"`
+		FinishReason string `json:"finish_reason"`
+		Delta        struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"delta"`
+	} `json:"choices"`
+	Usage struct {
+		PromptTokens     int64 `json:"prompt_tokens"`
+		CompletionTokens int64 `json:"completion_tokens"`
+		TotalTokens      int64 `json:"total_tokens"`
+	} `json:"usage"`
 	Error struct {
-		Code    int64  `json:"code"`
+		Code    string `json:"code"`
 		Message string `json:"message"`
 	} `json:"error"`
 }
 
-type MoonshotStreamResp struct {
-	Id      string `json:"id"`
-	Object  string `json:"object"`
-	Created int    `json:"created"`
-	Model   string `json:"model"`
-	Choices []struct {
-		Index int `json:"index"`
-		Delta struct {
-			Content string `json:"content"`
-		} `json:"delta"`
-		FinishReason string `json:"finish_reason"`
-		Usage        struct {
-			PromptTokens     int64 `json:"prompt_tokens"`
-			CompletionTokens int64 `json:"completion_tokens"`
-			TotalTokens      int64 `json:"total_tokens"`
-		} `json:"usage"`
-	} `json:"choices"`
-	SystemFingerprint string `json:"system_fingerprint"`
+type GlmErrorInfo struct {
+	Error struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
 }
 
-func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
+func (g *GlmServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
 	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
 
-	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	headers := map[string]string{"Authorization": "Bearer " + g.Conf.Key, "Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err
@@ -206,7 +194,7 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 
 			if errors.Is(err, io.EOF) {
 				resErr := err
-				errStruct := &MoonshotErrorInfo{}
+				errStruct := &GlmErrorInfo{}
 				if err := json.Unmarshal(line, errStruct); err == nil {
 					resErr = errors.New(errStruct.Error.Message)
 				}
@@ -234,20 +222,27 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 			break
 		}
 
-		retStruct := MoonshotStreamResp{}
+		retStruct := GlmStreamResp{}
 		if err := json.Unmarshal(line, &retStruct); err != nil {
 			errChan <- err
 			return ret, err
 		}
+		if len(retStruct.Error.Message) > 0 {
+			err := errors.New(retStruct.Error.Message)
+			errChan <- err
+			return ret, err
+		}
+
 		if len(retStruct.Choices) == 0 {
 			continue
 		}
+
 		ret.ResponseText += retStruct.Choices[0].Delta.Content
 		msgCh <- retStruct.Choices[0].Delta.Content
 
 		if retStruct.Choices[0].FinishReason == "stop" {
-			ret.PromptTokens = retStruct.Choices[0].Usage.PromptTokens
-			ret.CompletionTokens = retStruct.Choices[0].Usage.CompletionTokens
+			ret.PromptTokens = retStruct.Usage.PromptTokens
+			ret.CompletionTokens = retStruct.Usage.CompletionTokens
 			close(msgCh)
 			break
 		}
