@@ -44,6 +44,12 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://cloud.tencent.com/document/api/1729/105701">参考文档</a></td>
         <td><a target="_blank" href="https://console.cloud.tencent.com/cam">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="https://chatglm.cn/img/icons/msapplication-icon-144x144.png" height="30" title="智谱清言"></td>
+        <td>智谱清言</td>
+        <td><a target="_blank" href="https://open.bigmodel.cn/dev/api/normal-model/glm-4">参考文档</a></td>
+        <td><a target="_blank" href="https://bigmodel.cn/usercenter/auth">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
