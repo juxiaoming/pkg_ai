@@ -38,6 +38,12 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen">参考文档</a></td>
         <td><a target="_blank" href="https://dashscope.console.aliyun.com/apiKey">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="https://cloudcache.tencent-cloud.com/qcloud/portal/kit/images/slice/logo.23996906.svg" height="30" title="混元大模型"></td>
+        <td>混元大模型</td>
+        <td><a target="_blank" href="https://cloud.tencent.com/document/api/1729/105701">参考文档</a></td>
+        <td><a target="_blank" href="https://console.cloud.tencent.com/cam">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
