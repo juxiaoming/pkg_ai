@@ -9,43 +9,43 @@ go get github.com/juxiaoming/pkg_ai
 <table>
     <tr><th>LOGO</th><th>模型名称</th><th>参考文档</th><th>应用申请</th></tr>
     <tr>
-        <td><img src="https://platform.moonshot.cn/logo.png" height="30" title="月之暗面"></td>
+        <td><img src="./logo/moonshot.png" height="30" title="月之暗面"></td>
         <td>月之暗面</td>
         <td><a target="_blank" href="https://platform.moonshot.cn/docs/api/chat#%E5%AD%97%E6%AE%B5%E8%AF%B4%E6%98%8E">参考文档</a></td>
         <td><a target="_blank" href="https://platform.moonshot.cn/console/api-keys">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://filecdn.minimax.chat/public/Group.png?x-oss-process=image/format,webp" height="30" title="minimax"></td>
+        <td><img src="./logo/minimaxi.png" height="30" title="minimax"></td>
         <td>Minimax</td>
         <td><a target="_blank" href="https://platform.minimaxi.com/document/ChatCompletion%20v2?key=66701d281d57f38758d581d0">参考文档</a></td>
         <td><a target="_blank" href="https://platform.minimaxi.com/user-center/basic-information/interface-key">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://portal.volccdn.com/obj/volcfe/logo/appbar_logo_dark.2.svg" height="30" title="火山引擎"></td>
+        <td><img src="./logo/volcengine.png" height="30" title="火山引擎"></td>
         <td>火山引擎</td>
         <td><a target="_blank" href="https://www.volcengine.com/docs/82379/1298454">参考文档</a></td>
         <td><a target="_blank" href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://nlp-eb.cdn.bcebos.com/static/eb/asset/logo.8a6b508d.png" height="30" title="百度千帆"><img src="https://nlp-eb.cdn.bcebos.com/static/eb/asset/logo-name.7e54ad31.png" height="18" title="百度千帆"></td>
+        <td><img src="./logo/baidu.png" height="30" title="百度千帆"></td>
         <td>百度千帆</td>
         <td><a target="_blank" href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t#http%E8%B0%83%E7%94%A8">参考文档</a></td>
         <td><a target="_blank" href="https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v1">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://img.alicdn.com/imgextra/i1/O1CN01AKUdEM1qP6BQVaYhT_!!6000000005487-2-tps-512-512.png" height="30" title="通义千问"></td>
+        <td><img src="./logo/aliyun.png" height="30" title="通义千问"></td>
         <td>通义千问</td>
         <td><a target="_blank" href="https://help.aliyun.com/zh/dashscope/developer-reference/use-qwen">参考文档</a></td>
         <td><a target="_blank" href="https://dashscope.console.aliyun.com/apiKey">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://cloudcache.tencent-cloud.com/qcloud/portal/kit/images/slice/logo.23996906.svg" height="30" title="混元大模型"></td>
+        <td><img src="./logo/tencent.png" height="30" title="混元大模型"></td>
         <td>混元大模型</td>
         <td><a target="_blank" href="https://cloud.tencent.com/document/api/1729/105701">参考文档</a></td>
         <td><a target="_blank" href="https://console.cloud.tencent.com/cam">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://chatglm.cn/img/icons/msapplication-icon-144x144.png" height="30" title="智谱清言"></td>
+        <td><img src="./logo/bigmodel.png" height="30" title="智谱清言"></td>
         <td>智谱清言</td>
         <td><a target="_blank" href="https://open.bigmodel.cn/dev/api/normal-model/glm-4">参考文档</a></td>
         <td><a target="_blank" href="https://bigmodel.cn/usercenter/auth">应用申请</a></td>
