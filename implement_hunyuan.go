@@ -24,7 +24,7 @@ type HunyuanConf struct {
 }
 
 func NewHunyuanConf(url, clientId, clientSecret string) *Config {
-	return &Config{BaiDuUrl: url, HunyuanClientId: clientId, HunyuanClientSecret: clientSecret}
+	return &Config{HunyuanUrl: url, HunyuanClientId: clientId, HunyuanClientSecret: clientSecret}
 }
 
 type HunyuanServer struct {
