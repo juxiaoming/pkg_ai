@@ -48,7 +48,7 @@ type Response struct {
 type Ability interface {
 	build(data RequestData, isStream bool) ([]byte, error)
 	Chat(requestPath string, data []byte) (*Response, error)
-	ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error)
+	ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error)
 	Supplier() string
 	RequestPath() string
 }
@@ -127,13 +127,13 @@ func (s *Server) Chat(data RequestData) (*Response, error) {
 }
 
 // ChatStream 流式对话
-func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan error, stopChan chan struct{}) (*Response, error) {
+func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan error) (*Response, error) {
 	payload, err := s.client.build(data, true)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan, stopChan)
+	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
 }
 
 // CustomizeChat 自定义参数阻塞式对话, 用户自己实现请求的body参数
@@ -142,6 +142,6 @@ func (s *Server) CustomizeChat(payload []byte) (*Response, error) {
 }
 
 // CustomizeChatStream 自定义参数流式对话, 用户自己实现请求的body参数
-func (s *Server) CustomizeChatStream(payload []byte, msgCh chan string, errChan chan error, stopChan chan struct{}) (*Response, error) {
-	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan, stopChan)
+func (s *Server) CustomizeChatStream(payload []byte, msgCh chan string, errChan chan error) (*Response, error) {
+	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
 }

@@ -5,7 +5,7 @@
 go get github.com/juxiaoming/pkg_ai
 ```
 
-### 支持第三方登录
+### 已接入大模型列表
 <table>
     <tr><th>LOGO</th><th>模型名称</th><th>参考文档</th><th>应用申请</th></tr>
     <tr>
@@ -21,8 +21,8 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://platform.minimaxi.com/user-center/basic-information/interface-key">应用申请</a></td>
     </tr>
     <tr>
-        <td><img src="https://portal.volccdn.com/obj/volcfe/logo/appbar_logo_dark.2.svg" height="30" title="volc"></td>
-        <td>豆包</td>
+        <td><img src="https://portal.volccdn.com/obj/volcfe/logo/appbar_logo_dark.2.svg" height="30" title="火山引擎"></td>
+        <td>火山引擎</td>
         <td><a target="_blank" href="https://www.volcengine.com/docs/82379/1298454">参考文档</a></td>
         <td><a target="_blank" href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey">应用申请</a></td>
     </tr>
@@ -41,36 +41,55 @@ go get github.com/juxiaoming/pkg_ai
 </table>
 
 ### 使用
+
+#### 初始化配置
 ```go
 // 初始化单服务配置
 pkg_ai.Init(pkg_ai.NewMoonshotConf("request_url" , "sk-your_key"))
 
 // 初始化多服务配置
 pkg_ai.Init(&pkg_ai.Config{...})
-
-// 实例化服务
+```
+#### 实例化服务
+```go
 server, err := pkg_ai.NewServer(pkg_ai.ImplementMoonshot)
 if err != nil {
     fmt.Println("服务初始化失败", err)
     return
 }
-
-// 请求数据
+```
+#### 常规请求参数
+```go
 requestData := pkg_ai.RequestData{
     Model:     "moonshot-v1-8k",
     UserQuery: "帮我写出岳飞的满江红",
 }
-
-// 阻塞式请求
-fmt.Println(server.Chat(data))
-
-// 流式请求
-msgChan, errChan, stopChan := make(chan string, 10000), make(chan error), make(chan struct{})
-fmt.Println(server.ChatStream(data, msgChan, errChan, stopChan))
+```
+#### 阻塞式请求
+```go
+// 常规请求
+res, err := server.Chat(data)
 
 // 自定义请求参数
-fmt.Println(server.CustomizeChat([]byte("{....}")))
-fmt.Println(server.CustomizeChatStream([]byte("{....}"), msgChan, errChan, stopChan))
+res , err := server.CustomizeChat([]byte("{....}"))
+```
+#### 流式请求
+```go
+msgChan, errChan := make(chan string, 10000), make(chan error)
+
+// 常规请求
+res , err := server.ChatStream(data, msgChan, errChan)
+
+// 自定义请求参数
+res , err := server.CustomizeChatStream([]byte("{....}"), msgChan, errChan)
+```
+#### 响应数据
+```go
+fmt.Println("请求的完整数据:", string(res.RequestData))
+fmt.Println("响应的完整数据:", string(res.ResponseData))
+fmt.Println("提示词消耗token数量:", res.PromptTokens)
+fmt.Println("响应消耗token数量:", res.CompletionTokens)
+fmt.Println("整理后的响应数据:", res.ResponseText)
 ```
 ### 建议
 建议初始化配置文件之后单次调用pkg_login.Init()方法注册服务配置

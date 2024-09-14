@@ -178,7 +178,7 @@ type QwenErrorInfo struct {
 	} `json:"error"`
 }
 
-func (q *QwenServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error) {
+func (q *QwenServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
 	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
 
 	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key, "Content-Type": "application/json"}

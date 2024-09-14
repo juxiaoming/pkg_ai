@@ -190,7 +190,7 @@ type MinimaxiStreamResp struct {
 	} `json:"base_resp"`
 }
 
-func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error, stopChan <-chan struct{}) (*Response, error) {
+func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
 	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
 
 	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key, "Content-Type": "application/json"}
