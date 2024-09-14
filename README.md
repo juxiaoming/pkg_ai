@@ -76,12 +76,36 @@ res , err := server.CustomizeChat([]byte("{....}"))
 #### 流式请求
 ```go
 msgChan, errChan := make(chan string, 10000), make(chan error)
+go func() {
+    // 常规请求
+    res , err := server.ChatStream(data, msgChan, errChan)
 
-// 常规请求
-res , err := server.ChatStream(data, msgChan, errChan)
+    // 自定义请求参数
+    res , err := server.CustomizeChatStream([]byte("{....}"), msgChan, errChan)
+}()
 
-// 自定义请求参数
-res , err := server.CustomizeChatStream([]byte("{....}"), msgChan, errChan)
+for {
+    select {
+    //todo 可引入stopChan控制请求流程
+		
+    case err := <-errChan:
+        fmt.Println("发生错误了:", err)
+        time.Sleep(time.Second * 10)
+        return
+
+    case data, ok := <-msgChan:
+        if !ok {
+            fmt.Println("消息管道关闭了")
+            time.Sleep(time.Second * 10)
+            return
+        }
+        if len(data) == 0 {
+            continue
+        }
+
+        fmt.Println("收到数据:", data)
+    }
+}
 ```
 #### 响应数据
 ```go
