@@ -5,6 +5,11 @@ type Message struct {
 	Content string `json:"content"`
 }
 
+type HunyuanMessage struct {
+	Role    string `json:"Role"`
+	Content string `json:"Content"`
+}
+
 type StreamOptions struct {
 	IncludeUsage bool `json:"include_usage"`
 }

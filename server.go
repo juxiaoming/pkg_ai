@@ -8,17 +8,20 @@ var (
 )
 
 type Config struct {
-	MoonshotUrl       string `json:"moonshot_url"`
-	MoonshotKey       string `json:"moonshot_key"`
-	MinimaxiUrl       string `json:"minimaxi_url"`
-	MinimaxiKey       string `json:"minimaxi_key"`
-	VolcUrl           string `json:"volc_url"`
-	VolcKey           string `json:"volc_key"`
-	BaiDuUrl          string `json:"bai_du_url"`
-	BaiDuClientId     string `json:"bai_du_client_id"`
-	BaiDuClientSecret string `json:"bai_du_client_secret"`
-	QwenUrl           string `json:"qwen_url"`
-	QwenKey           string `json:"qwen_key"`
+	MoonshotUrl         string `json:"moonshot_url"`
+	MoonshotKey         string `json:"moonshot_key"`
+	MinimaxiUrl         string `json:"minimaxi_url"`
+	MinimaxiKey         string `json:"minimaxi_key"`
+	VolcUrl             string `json:"volc_url"`
+	VolcKey             string `json:"volc_key"`
+	BaiDuUrl            string `json:"bai_du_url"`
+	BaiDuClientId       string `json:"bai_du_client_id"`
+	BaiDuClientSecret   string `json:"bai_du_client_secret"`
+	QwenUrl             string `json:"qwen_url"`
+	QwenKey             string `json:"qwen_key"`
+	HunyuanUrl          string `json:"hunyuan_url"`
+	HunyuanClientId     string `json:"hunyuan_client_id"`
+	HunyuanClientSecret string `json:"hunyuan_client_secret"`
 }
 
 type RequestData struct {
@@ -69,6 +72,7 @@ const (
 	ImplementVolc     int8 = 3 // Volc
 	ImplementBaidu    int8 = 4 // 百度
 	ImplementQwen     int8 = 5 // 通义千问
+	ImplementHunyuan  int8 = 6 // 混元大模型
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -109,6 +113,12 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newQwenServer(config.QwenUrl, config.QwenKey)
+	case ImplementHunyuan:
+		if len(config.HunyuanUrl) == 0 || len(config.HunyuanClientId) == 0 || len(config.HunyuanClientSecret) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newHunyuanServer(config.HunyuanUrl, config.HunyuanClientId, config.HunyuanClientSecret)
 	default:
 		return nil, errors.New("未定义实现")
 	}
