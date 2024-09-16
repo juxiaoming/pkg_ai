@@ -56,6 +56,12 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html">参考文档</a></td>
         <td><a target="_blank" href="https://console.xfyun.cn/services/bm3">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="./logo/baichuan.png" height="30" title="百川智能"></td>
+        <td>百川智能</td>
+        <td><a target="_blank" href="https://platform.baichuan-ai.com/docs/api">参考文档</a></td>
+        <td><a target="_blank" href="https://platform.baichuan-ai.com/console/apikey">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
