@@ -62,6 +62,12 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://platform.baichuan-ai.com/docs/api">参考文档</a></td>
         <td><a target="_blank" href="https://platform.baichuan-ai.com/console/apikey">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="./logo/sensenova.png" height="30" title="商汤日日新"></td>
+        <td>商汤日日新</td>
+        <td><a target="_blank" href="https://platform.sensenova.cn/doc?path=/chat/ChatCompletions/ChatCompletions.md">参考文档</a></td>
+        <td><a target="_blank" href="https://console.sensecore.cn/iam/Security/access-key">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
