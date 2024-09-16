@@ -26,6 +26,8 @@ type Config struct {
 	GlmKey              string `json:"glm_key"`
 	XfYunUrl            string `json:"xf_yun_url"`
 	XfYunKey            string `json:"xf_yun_key"`
+	BaiChuanUrl         string `json:"bai_chuan_url"`
+	BaiChuanKey         string `json:"bai_chuan_key"`
 }
 
 type RequestData struct {
@@ -79,6 +81,7 @@ const (
 	ImplementHunyuan  int8 = 6 // 混元大模型
 	ImplementGlm      int8 = 7 // 智谱清言
 	ImplementXfYun    int8 = 8 // 科大讯飞
+	ImplementBaiChuan int8 = 9 // 百川智能
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -137,6 +140,12 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newXfYunServer(config.XfYunUrl, config.XfYunKey)
+	case ImplementBaiChuan:
+		if len(config.BaiChuanUrl) == 0 || len(config.BaiChuanKey) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newBaiChuanServer(config.BaiChuanUrl, config.BaiChuanKey)
 	default:
 		return nil, errors.New("未定义实现")
 	}
