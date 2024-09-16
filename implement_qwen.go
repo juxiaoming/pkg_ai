@@ -109,8 +109,9 @@ type QwenChatResponse struct {
 }
 
 func (q *QwenServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestData: data}
 	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key, "Content-Type": "application/json"}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -179,9 +180,9 @@ type QwenErrorInfo struct {
 }
 
 func (q *QwenServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
-
 	headers := map[string]string{"Authorization": "Bearer " + q.Conf.Key, "Content-Type": "application/json"}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err

@@ -164,15 +164,16 @@ type BaiDuResponse struct {
 }
 
 func (b *BaiDuServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestData: data}
+	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
 
 	token, err := b.Token()
 	if err != nil {
 		return ret, err
 	}
 	requestPath = requestPath + "?access_token=" + token
+	headers := map[string]string{"Content-Type": "application/json", "Authorization": "Bearer " + token}
+	ret.RequestHeader = headers
 
-	headers := map[string]string{"Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -229,15 +230,16 @@ type BaiDuErrorInfo struct {
 }
 
 func (b *BaiDuServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
 
 	token, err := b.Token()
 	if err != nil {
 		return ret, err
 	}
 	requestPath = requestPath + "?access_token=" + token
+	headers := map[string]string{"Content-Type": "application/json", "Authorization": "Bearer " + token}
+	ret.RequestHeader = headers
 
-	headers := map[string]string{"Content-Type": "application/json"}
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err

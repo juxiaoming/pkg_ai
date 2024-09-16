@@ -158,8 +158,6 @@ type HunyuanChatResponse struct {
 }
 
 func (h *HunyuanServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestData: data}
-
 	timestamp := time.Now().Unix()
 	headers := map[string]string{
 		"Authorization":  h.token(data, timestamp),
@@ -169,6 +167,8 @@ func (h *HunyuanServer) Chat(requestPath string, data []byte) (*Response, error)
 		"Host":           "hunyuan.tencentcloudapi.com",
 		"content-type":   "application/json",
 	}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -240,8 +240,6 @@ type HunyuanStreamResp struct {
 }
 
 func (h *HunyuanServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
-
 	timestamp := time.Now().Unix()
 	headers := map[string]string{
 		"Authorization":  h.token(data, timestamp),
@@ -251,6 +249,8 @@ func (h *HunyuanServer) ChatStream(requestPath string, data []byte, msgCh chan s
 		"Host":           "hunyuan.tencentcloudapi.com",
 		"content-type":   "application/json",
 	}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err

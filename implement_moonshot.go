@@ -118,8 +118,9 @@ type MoonshotChatResponse struct {
 }
 
 func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestData: data}
 	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -183,9 +184,9 @@ type MoonshotStreamResp struct {
 }
 
 func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
-
 	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key}
+	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err

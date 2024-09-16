@@ -50,11 +50,12 @@ type RequestData struct {
 }
 
 type Response struct {
-	RequestData      []byte `json:"request_data"`      // 请求原始数据
-	ResponseData     []byte `json:"response_data"`     // 响应原始数据
-	PromptTokens     int64  `json:"prompt_tokens"`     // 输入提示词token
-	CompletionTokens int64  `json:"completion_tokens"` // 响应token
-	ResponseText     string `json:"response_text"`     // 整理后的响应结果
+	RequestHeader    map[string]string `json:"request_header"`    // 请求header头部信息
+	RequestBody      []byte            `json:"request_body"`      // 请求body体信息
+	ResponseData     []byte            `json:"response_data"`     // 响应原始数据
+	PromptTokens     int64             `json:"prompt_tokens"`     // 输入提示词token
+	CompletionTokens int64             `json:"completion_tokens"` // 响应token
+	ResponseText     string            `json:"response_text"`     // 整理后的响应结果
 }
 
 type Ability interface {

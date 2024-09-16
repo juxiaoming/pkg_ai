@@ -139,8 +139,9 @@ for {
 ```
 #### 响应数据
 ```go
-fmt.Println("请求的完整数据:", string(res.RequestData))
-fmt.Println("响应的完整数据:", string(res.ResponseData))
+fmt.Println("请求头:", string(res.RequestHeader))
+fmt.Println("请求体:", string(res.RequestBody))
+fmt.Println("响应体:", string(res.ResponseData))
 fmt.Println("提示词消耗token数量:", res.PromptTokens)
 fmt.Println("响应消耗token数量:", res.CompletionTokens)
 fmt.Println("整理后的响应数据:", res.ResponseText)

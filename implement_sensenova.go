@@ -120,7 +120,7 @@ type SensenovaChatResponse struct {
 }
 
 func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestData: data}
+	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
 
 	token, err := s.token(s.Conf.ClientId, s.Conf.ClientSecret)
 	if err != nil {
@@ -128,6 +128,7 @@ func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, erro
 	}
 
 	headers := map[string]string{"Authorization": "Bearer " + token, "Content-Type": "application/json"}
+	ret.RequestHeader = headers
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -199,7 +200,7 @@ type SensenovaErrorInfo struct {
 }
 
 func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestData: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
 
 	token, err := s.token(s.Conf.ClientId, s.Conf.ClientSecret)
 	if err != nil {
@@ -207,6 +208,7 @@ func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan
 	}
 
 	headers := map[string]string{"Authorization": "Bearer " + token, "Content-Type": "application/json"}
+	ret.RequestHeader = headers
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err
