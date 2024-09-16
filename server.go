@@ -8,26 +8,29 @@ var (
 )
 
 type Config struct {
-	MoonshotUrl         string `json:"moonshot_url"`
-	MoonshotKey         string `json:"moonshot_key"`
-	MinimaxiUrl         string `json:"minimaxi_url"`
-	MinimaxiKey         string `json:"minimaxi_key"`
-	VolcUrl             string `json:"volc_url"`
-	VolcKey             string `json:"volc_key"`
-	BaiDuUrl            string `json:"bai_du_url"`
-	BaiDuClientId       string `json:"bai_du_client_id"`
-	BaiDuClientSecret   string `json:"bai_du_client_secret"`
-	QwenUrl             string `json:"qwen_url"`
-	QwenKey             string `json:"qwen_key"`
-	HunyuanUrl          string `json:"hunyuan_url"`
-	HunyuanClientId     string `json:"hunyuan_client_id"`
-	HunyuanClientSecret string `json:"hunyuan_client_secret"`
-	GlmUrl              string `json:"glm_url"`
-	GlmKey              string `json:"glm_key"`
-	XfYunUrl            string `json:"xf_yun_url"`
-	XfYunKey            string `json:"xf_yun_key"`
-	BaiChuanUrl         string `json:"bai_chuan_url"`
-	BaiChuanKey         string `json:"bai_chuan_key"`
+	MoonshotUrl           string `json:"moonshot_url"`
+	MoonshotKey           string `json:"moonshot_key"`
+	MinimaxiUrl           string `json:"minimaxi_url"`
+	MinimaxiKey           string `json:"minimaxi_key"`
+	VolcUrl               string `json:"volc_url"`
+	VolcKey               string `json:"volc_key"`
+	BaiDuUrl              string `json:"bai_du_url"`
+	BaiDuClientId         string `json:"bai_du_client_id"`
+	BaiDuClientSecret     string `json:"bai_du_client_secret"`
+	QwenUrl               string `json:"qwen_url"`
+	QwenKey               string `json:"qwen_key"`
+	HunyuanUrl            string `json:"hunyuan_url"`
+	HunyuanClientId       string `json:"hunyuan_client_id"`
+	HunyuanClientSecret   string `json:"hunyuan_client_secret"`
+	GlmUrl                string `json:"glm_url"`
+	GlmKey                string `json:"glm_key"`
+	XfYunUrl              string `json:"xf_yun_url"`
+	XfYunKey              string `json:"xf_yun_key"`
+	BaiChuanUrl           string `json:"bai_chuan_url"`
+	BaiChuanKey           string `json:"bai_chuan_key"`
+	SensenovaUrl          string `json:"sensenova_url"`
+	SensenovaClientId     string `json:"sensenova_client_id"`
+	SensenovaClientSecret string `json:"sensenova_client_secret"`
 }
 
 type RequestData struct {
@@ -73,15 +76,16 @@ type Server struct {
 }
 
 const (
-	ImplementMoonshot int8 = 1 // 月之暗面
-	ImplementMinimaxi int8 = 2 // Minimaxi
-	ImplementVolc     int8 = 3 // Volc
-	ImplementBaidu    int8 = 4 // 百度
-	ImplementQwen     int8 = 5 // 通义千问
-	ImplementHunyuan  int8 = 6 // 混元大模型
-	ImplementGlm      int8 = 7 // 智谱清言
-	ImplementXfYun    int8 = 8 // 科大讯飞
-	ImplementBaiChuan int8 = 9 // 百川智能
+	ImplementMoonshot  int8 = 1  // 月之暗面
+	ImplementMinimaxi  int8 = 2  // Minimaxi
+	ImplementVolc      int8 = 3  // Volc
+	ImplementBaidu     int8 = 4  // 百度
+	ImplementQwen      int8 = 5  // 通义千问
+	ImplementHunyuan   int8 = 6  // 混元大模型
+	ImplementGlm       int8 = 7  // 智谱清言
+	ImplementXfYun     int8 = 8  // 科大讯飞
+	ImplementBaiChuan  int8 = 9  // 百川智能
+	ImplementSensenova int8 = 10 // 商汤日日新
 )
 
 func NewServer(implementId int8) (*Server, error) {
@@ -146,6 +150,12 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newBaiChuanServer(config.BaiChuanUrl, config.BaiChuanKey)
+	case ImplementSensenova:
+		if len(config.SensenovaUrl) == 0 || len(config.SensenovaClientId) == 0 || len(config.SensenovaClientSecret) == 0 {
+			return nil, errors.New("缺失配置")
+		}
+
+		client = newSensenovaServer(config.SensenovaUrl, config.SensenovaClientId, config.SensenovaClientSecret)
 	default:
 		return nil, errors.New("未定义实现")
 	}
