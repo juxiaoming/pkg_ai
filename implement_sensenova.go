@@ -115,7 +115,7 @@ type SensenovaChatResponse struct {
 	} `json:"data"`
 	Error struct {
 		Message string `json:"message"`
-		Code    string `json:"code"`
+		Code    int64  `json:"code"`
 	} `json:"error"`
 }
 
@@ -187,14 +187,14 @@ type SensenovaStreamResp struct {
 	} `json:"status"`
 	Error struct {
 		Message string `json:"message"`
-		Code    string `json:"code"`
+		Code    int64  `json:"code"`
 	} `json:"error"`
 }
 
 type SensenovaErrorInfo struct {
 	Error struct {
 		Message string `json:"message"`
-		Code    string `json:"code"`
+		Code    int64  `json:"code"`
 	} `json:"error"`
 }
 
