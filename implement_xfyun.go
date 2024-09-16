@@ -93,6 +93,12 @@ type XfYunChatResponse struct {
 		CompletionTokens int64 `json:"completion_tokens"`
 		TotalTokens      int64 `json:"total_tokens"`
 	} `json:"usage"`
+	Error struct {
+		Message string      `json:"message"`
+		Type    string      `json:"type"`
+		Param   interface{} `json:"param"`
+		Code    string      `json:"code"`
+	} `json:"error"`
 }
 
 func (x *XfYunServer) Chat(requestPath string, data []byte) (*Response, error) {
@@ -121,7 +127,11 @@ func (x *XfYunServer) Chat(requestPath string, data []byte) (*Response, error) {
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
 	if retStruct.Message != "Success" {
-		return ret, errors.New(retStruct.Message)
+		if len(retStruct.Message) > 0 {
+			return ret, errors.New(retStruct.Message)
+		} else {
+			return ret, errors.New(retStruct.Error.Message)
+		}
 	}
 
 	if len(retStruct.Choices) == 0 {
@@ -151,10 +161,22 @@ type XfYunStreamResp struct {
 		CompletionTokens int64 `json:"completion_tokens"`
 		TotalTokens      int64 `json:"total_tokens"`
 	} `json:"usage"`
+	Error struct {
+		Message string      `json:"message"`
+		Type    string      `json:"type"`
+		Param   interface{} `json:"param"`
+		Code    string      `json:"code"`
+	} `json:"error"`
 }
 
 type XfYunErrorInfo struct {
 	Message string `json:"message"`
+	Error   struct {
+		Message string      `json:"message"`
+		Type    string      `json:"type"`
+		Param   interface{} `json:"param"`
+		Code    string      `json:"code"`
+	} `json:"error"`
 }
 
 func (x *XfYunServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
@@ -183,7 +205,11 @@ func (x *XfYunServer) ChatStream(requestPath string, data []byte, msgCh chan str
 				resErr := err
 				errStruct := &XfYunErrorInfo{}
 				if err := json.Unmarshal(line, errStruct); err == nil {
-					resErr = errors.New(errStruct.Message)
+					if len(errStruct.Message) > 0 {
+						resErr = errors.New(errStruct.Message)
+					} else {
+						resErr = errors.New(errStruct.Error.Message)
+					}
 				}
 
 				errChan <- resErr
@@ -214,8 +240,13 @@ func (x *XfYunServer) ChatStream(requestPath string, data []byte, msgCh chan str
 			errChan <- err
 			return ret, err
 		}
+
 		if retStruct.Message != "Success" {
-			err := errors.New(retStruct.Message)
+			if len(retStruct.Message) > 0 {
+				err = errors.New(retStruct.Message)
+			} else {
+				err = errors.New(retStruct.Error.Message)
+			}
 			errChan <- err
 			return ret, err
 		}
