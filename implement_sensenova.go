@@ -244,7 +244,7 @@ func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan
 			continue
 		}
 
-		headerData := []byte("data: ")
+		headerData := []byte("data:")
 		if !bytes.HasPrefix(line, headerData) {
 			continue
 		}
