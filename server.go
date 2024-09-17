@@ -193,3 +193,7 @@ func (s *Server) CustomizeChat(payload []byte) (*Response, error) {
 func (s *Server) CustomizeChatStream(payload []byte, msgCh chan string, errChan chan error) (*Response, error) {
 	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
 }
+
+func (s *Server) Supplier() string {
+	return s.client.Supplier()
+}

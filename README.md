@@ -139,12 +139,29 @@ for {
 ```
 #### 响应数据
 ```go
-fmt.Println("请求头:", string(res.RequestHeader))
-fmt.Println("请求体:", string(res.RequestBody))
-fmt.Println("响应体:", string(res.ResponseData))
-fmt.Println("提示词消耗token数量:", res.PromptTokens)
-fmt.Println("响应消耗token数量:", res.CompletionTokens)
-fmt.Println("整理后的响应数据:", res.ResponseText)
+// 请求头
+fmt.Println(string(res.RequestHeader))
+
+// 请求体
+fmt.Println(string(res.RequestBody))
+
+// 响应体:
+for _, item := range res.ResponseData {
+    fmt.Println("响应数据:" , string(item))
+}
+
+// 提示词消耗token数量
+fmt.Println(res.PromptTokens)
+
+// 响应消耗token数量
+fmt.Println(res.CompletionTokens)
+
+// 整理后的响应数据
+fmt.Println(res.ResponseText)
+```
+#### 模型供应商
+```go
+fmt.Println(server.Supplier())
 ```
 ### 建议
 建议初始化配置文件之后单次调用pkg_login.Init()方法注册服务配置
