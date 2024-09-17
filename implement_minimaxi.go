@@ -112,7 +112,8 @@ type MinimaxiResponse struct {
 
 func (m *MinimaxiServer) Chat(requestPath string, data []byte) (*Response, error) {
 	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key, "Content-Type": "application/json"}
-	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -123,7 +124,7 @@ func (m *MinimaxiServer) Chat(requestPath string, data []byte) (*Response, error
 	}()
 
 	retBytes, err := io.ReadAll(response.Body)
-	ret.ResponseData = retBytes
+	ret.ResponseData = append(ret.ResponseData, retBytes)
 	if err != nil {
 		return ret, err
 	}
@@ -193,7 +194,8 @@ type MinimaxiStreamResp struct {
 
 func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
 	headers := map[string]string{"Authorization": "Bearer " + m.Conf.Key, "Content-Type": "application/json"}
-	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -208,7 +210,7 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 
 	for {
 		line, _, err := reader.ReadLine()
-		ret.ResponseData = append(ret.ResponseData, line...)
+		ret.ResponseData = append(ret.ResponseData, line)
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
 		if err != nil {

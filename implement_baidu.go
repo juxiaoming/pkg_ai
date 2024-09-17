@@ -164,7 +164,7 @@ type BaiDuResponse struct {
 }
 
 func (b *BaiDuServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
 
 	token, err := b.Token()
 	if err != nil {
@@ -172,7 +172,7 @@ func (b *BaiDuServer) Chat(requestPath string, data []byte) (*Response, error) {
 	}
 	requestPath = requestPath + "?access_token=" + token
 	headers := map[string]string{"Content-Type": "application/json", "Authorization": "Bearer " + token}
-	ret.RequestHeader = headers
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -183,7 +183,7 @@ func (b *BaiDuServer) Chat(requestPath string, data []byte) (*Response, error) {
 	}()
 
 	retBytes, err := io.ReadAll(response.Body)
-	ret.ResponseData = retBytes
+	ret.ResponseData = append(ret.ResponseData, retBytes)
 	if err != nil {
 		return ret, err
 	}
@@ -230,7 +230,7 @@ type BaiDuErrorInfo struct {
 }
 
 func (b *BaiDuServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
 
 	token, err := b.Token()
 	if err != nil {
@@ -238,7 +238,7 @@ func (b *BaiDuServer) ChatStream(requestPath string, data []byte, msgCh chan str
 	}
 	requestPath = requestPath + "?access_token=" + token
 	headers := map[string]string{"Content-Type": "application/json", "Authorization": "Bearer " + token}
-	ret.RequestHeader = headers
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -253,7 +253,7 @@ func (b *BaiDuServer) ChatStream(requestPath string, data []byte, msgCh chan str
 
 	for {
 		line, _, err := reader.ReadLine()
-		ret.ResponseData = append(ret.ResponseData, line...)
+		ret.ResponseData = append(ret.ResponseData, line)
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
 		if err != nil {

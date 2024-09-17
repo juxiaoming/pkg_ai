@@ -120,7 +120,7 @@ type SensenovaChatResponse struct {
 }
 
 func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, error) {
-	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
 
 	token, err := s.token(s.Conf.ClientId, s.Conf.ClientSecret)
 	if err != nil {
@@ -128,7 +128,7 @@ func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, erro
 	}
 
 	headers := map[string]string{"Authorization": "Bearer " + token, "Content-Type": "application/json"}
-	ret.RequestHeader = headers
+	ret.RequestHeader, _ = json.Marshal(headers)
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		return ret, err
@@ -138,7 +138,7 @@ func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, erro
 	}()
 
 	retBytes, err := io.ReadAll(response.Body)
-	ret.ResponseData = retBytes
+	ret.ResponseData = append(ret.ResponseData, retBytes)
 	if err != nil {
 		return ret, err
 	}
@@ -200,7 +200,7 @@ type SensenovaErrorInfo struct {
 }
 
 func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	ret := &Response{RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
 
 	token, err := s.token(s.Conf.ClientId, s.Conf.ClientSecret)
 	if err != nil {
@@ -208,7 +208,7 @@ func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan
 	}
 
 	headers := map[string]string{"Authorization": "Bearer " + token, "Content-Type": "application/json"}
-	ret.RequestHeader = headers
+	ret.RequestHeader, _ = json.Marshal(headers)
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
 		errChan <- err
@@ -222,7 +222,7 @@ func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan
 
 	for {
 		line, err := reader.ReadBytes('\n')
-		ret.ResponseData = append(ret.ResponseData, line...)
+		ret.ResponseData = append(ret.ResponseData, line)
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
 		if err != nil {

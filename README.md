@@ -149,4 +149,4 @@ fmt.Println("整理后的响应数据:", res.ResponseText)
 ### 建议
 建议初始化配置文件之后单次调用pkg_login.Init()方法注册服务配置
 ### 更多
-等我！
+如果有好的ai模型建议,请联系我!

@@ -167,7 +167,8 @@ func (h *HunyuanServer) Chat(requestPath string, data []byte) (*Response, error)
 		"Host":           "hunyuan.tencentcloudapi.com",
 		"content-type":   "application/json",
 	}
-	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -178,7 +179,7 @@ func (h *HunyuanServer) Chat(requestPath string, data []byte) (*Response, error)
 	}()
 
 	retBytes, err := io.ReadAll(response.Body)
-	ret.ResponseData = retBytes
+	ret.ResponseData = append(ret.ResponseData, retBytes)
 	if err != nil {
 		return ret, err
 	}
@@ -249,7 +250,8 @@ func (h *HunyuanServer) ChatStream(requestPath string, data []byte, msgCh chan s
 		"Host":           "hunyuan.tencentcloudapi.com",
 		"content-type":   "application/json",
 	}
-	ret := &Response{RequestHeader: headers, RequestBody: data, ResponseData: make([]byte, 0)}
+	ret := &Response{RequestHeader: make([]byte, 0), RequestBody: data, ResponseData: make([][]byte, 0)}
+	ret.RequestHeader, _ = json.Marshal(headers)
 
 	response, err := postBase(requestPath, string(data), headers)
 	if err != nil {
@@ -264,7 +266,7 @@ func (h *HunyuanServer) ChatStream(requestPath string, data []byte, msgCh chan s
 
 	for {
 		line, err := reader.ReadBytes('\n')
-		ret.ResponseData = append(ret.ResponseData, line...)
+		ret.ResponseData = append(ret.ResponseData, line)
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
 		if err != nil {
