@@ -5,7 +5,7 @@
 go get github.com/juxiaoming/pkg_ai
 ```
 
-### 已接入大模型列表
+### 已调研大模型列表
 <table>
     <tr><th>LOGO</th><th>模型名称</th><th>参考文档</th><th>应用申请</th></tr>
     <tr>
@@ -68,6 +68,18 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://platform.sensenova.cn/doc?path=/chat/ChatCompletions/ChatCompletions.md">参考文档</a></td>
         <td><a target="_blank" href="https://console.sensecore.cn/iam/Security/access-key">应用申请</a></td>
     </tr>
+    <tr>
+        <td><img src="./logo/chatgpt.png" height="30" title="ChatGpt"></td>
+        <td>( &#10008; )ChatGpt</td>
+        <td><a target="_blank" href="https://platform.openai.com/docs/overview">参考文档</a></td>
+        <td><a target="_blank" href="https://platform.openai.com/settings/profile/api-keys">应用申请</a></td>
+    </tr>
+    <tr>
+        <td><img src="./logo/gemini.png" height="30" title="Gemini"></td>
+        <td>( &#10008; )Gemini</td>
+        <td><a target="_blank" href="https://ai.google.dev/gemini-api/docs/get-started/tutorial?lang=python&hl=zh-cn">参考文档</a></td>
+        <td><a target="_blank" href="https://aistudio.google.com/app/apikey">应用申请</a></td>
+    </tr>
 </table>
 
 ### 使用
@@ -77,7 +89,10 @@ go get github.com/juxiaoming/pkg_ai
 // 初始化单服务配置
 pkg_ai.Init(pkg_ai.NewMoonshotConf("request_url" , "sk-your_key"))
 
-// 初始化多服务配置
+// 追加配置,用于配置多个服务(如果追加相同服务的配置，后者会覆盖前面的配置信息)
+pkg_ai.Init(pkg_ai.NewMoonshotConf("request_url" , "sk-your_key") ,WithBaiChuanConfig("baichuan_url" , "baichuan_key"))
+
+// 自定义初始化服务配置
 pkg_ai.Init(&pkg_ai.Config{...})
 ```
 #### 实例化服务
@@ -158,6 +173,12 @@ fmt.Println(res.CompletionTokens)
 
 // 整理后的响应数据
 fmt.Println(res.ResponseText)
+
+// 请求耗时
+fmt.Println(res.SpendTime)
+
+// 请求唯一ID
+fmt.Println(res.RequestId)
 ```
 #### 模型供应商
 ```go

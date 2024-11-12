@@ -1,6 +1,9 @@
 package pkg_ai
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 var (
 	config  Config // 全局配置
@@ -56,6 +59,8 @@ type Response struct {
 	PromptTokens     int64    `json:"prompt_tokens"`     // 输入提示词token
 	CompletionTokens int64    `json:"completion_tokens"` // 响应token
 	ResponseText     string   `json:"response_text"`     // 整理后的响应结果
+	SpendTime        int64    `json:"spend_time"`        // 请求耗时
+	RequestId        string   `json:"request_id"`        // 请求唯一ID
 }
 
 type Ability interface {
@@ -66,7 +71,12 @@ type Ability interface {
 	RequestPath() string
 }
 
-func Init(conf *Config) {
+func Init(conf *Config, options ...Options) {
+
+	for _, option := range options {
+		option.Apply(conf)
+	}
+
 	config = *conf
 	hasInit = true
 }
@@ -87,11 +97,19 @@ const (
 	ImplementXfYun     int8 = 8  // 科大讯飞
 	ImplementBaiChuan  int8 = 9  // 百川智能
 	ImplementSensenova int8 = 10 // 商汤日日新
+	ImplementChatGpt   int8 = 11 // chatGpt
+	ImplementGemini    int8 = 12 // gemini
+)
+
+var (
+	ErrorNoInit      = errors.New("配置未初始化,请先调用【Init】方法")
+	ErrorNoConfig    = errors.New("缺失配置")
+	ErrorNoImplement = errors.New("未定义实现")
 )
 
 func NewServer(implementId int8) (*Server, error) {
 	if !hasInit {
-		return nil, errors.New("配置未初始化,请先调用【Init】方法")
+		return nil, ErrorNoInit
 	}
 
 	var client Ability
@@ -99,66 +117,76 @@ func NewServer(implementId int8) (*Server, error) {
 	switch implementId {
 	case ImplementMoonshot:
 		if len(config.MoonshotKey) == 0 || len(config.MoonshotUrl) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newMoonshotServer(config.MoonshotUrl, config.MoonshotKey)
+
 	case ImplementMinimaxi:
 		if len(config.MinimaxiUrl) == 0 || len(config.MinimaxiKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newMinimaxiServer(config.MinimaxiUrl, config.MinimaxiKey)
+
 	case ImplementVolc:
 		if len(config.VolcUrl) == 0 || len(config.VolcKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newVolcServer(config.VolcUrl, config.VolcKey)
+
 	case ImplementBaidu:
 		if len(config.BaiDuUrl) == 0 || len(config.BaiDuClientId) == 0 || len(config.BaiDuClientSecret) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newBaiDuServer(config.BaiDuUrl, config.BaiDuClientId, config.BaiDuClientSecret)
+
 	case ImplementQwen:
 		if len(config.QwenUrl) == 0 || len(config.QwenKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newQwenServer(config.QwenUrl, config.QwenKey)
+
 	case ImplementHunyuan:
 		if len(config.HunyuanUrl) == 0 || len(config.HunyuanClientId) == 0 || len(config.HunyuanClientSecret) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newHunyuanServer(config.HunyuanUrl, config.HunyuanClientId, config.HunyuanClientSecret)
+
 	case ImplementGlm:
 		if len(config.GlmUrl) == 0 || len(config.GlmKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newQwenServer(config.GlmUrl, config.GlmKey)
+
 	case ImplementXfYun:
 		if len(config.XfYunUrl) == 0 || len(config.XfYunKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newXfYunServer(config.XfYunUrl, config.XfYunKey)
+
 	case ImplementBaiChuan:
 		if len(config.BaiChuanUrl) == 0 || len(config.BaiChuanKey) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newBaiChuanServer(config.BaiChuanUrl, config.BaiChuanKey)
+
 	case ImplementSensenova:
 		if len(config.SensenovaUrl) == 0 || len(config.SensenovaClientId) == 0 || len(config.SensenovaClientSecret) == 0 {
-			return nil, errors.New("缺失配置")
+			return nil, ErrorNoConfig
 		}
 
 		client = newSensenovaServer(config.SensenovaUrl, config.SensenovaClientId, config.SensenovaClientSecret)
+
 	default:
-		return nil, errors.New("未定义实现")
+		return nil, ErrorNoImplement
 	}
 
 	return &Server{client: client, ImplementId: implementId}, nil
@@ -166,32 +194,52 @@ func NewServer(implementId int8) (*Server, error) {
 
 // Chat 阻塞式对话
 func (s *Server) Chat(data RequestData) (*Response, error) {
-	payload, err := s.client.build(data, false)
-	if err != nil {
-		return nil, err
-	}
+	return timer(func() (*Response, error) {
+		payload, err := s.client.build(data, false)
+		if err != nil {
+			return &Response{}, err
+		}
 
-	return s.client.Chat(s.client.RequestPath(), payload)
+		return s.client.Chat(s.client.RequestPath(), payload)
+	})
 }
 
 // ChatStream 流式对话
 func (s *Server) ChatStream(data RequestData, msgCh chan string, errChan chan error) (*Response, error) {
-	payload, err := s.client.build(data, true)
-	if err != nil {
-		return nil, err
-	}
+	return timer(func() (*Response, error) {
+		payload, err := s.client.build(data, true)
+		if err != nil {
+			return &Response{}, err
+		}
 
-	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
+		return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
+	})
 }
 
 // CustomizeChat 自定义参数阻塞式对话, 用户自己实现请求的body参数
 func (s *Server) CustomizeChat(payload []byte) (*Response, error) {
-	return s.client.Chat(s.client.RequestPath(), payload)
+	return timer(func() (*Response, error) {
+		return s.client.Chat(s.client.RequestPath(), payload)
+	})
 }
 
 // CustomizeChatStream 自定义参数流式对话, 用户自己实现请求的body参数
 func (s *Server) CustomizeChatStream(payload []byte, msgCh chan string, errChan chan error) (*Response, error) {
-	return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
+	return timer(func() (*Response, error) {
+		return s.client.ChatStream(s.client.RequestPath(), payload, msgCh, errChan)
+	})
+}
+
+func timer(fun func() (*Response, error)) (*Response, error) {
+	start := time.Now()
+
+	response, err := fun()
+
+	if errors.Is(err, nil) {
+		response.SpendTime = time.Now().Sub(start).Milliseconds()
+	}
+
+	return response, err
 }
 
 func (s *Server) Supplier() string {

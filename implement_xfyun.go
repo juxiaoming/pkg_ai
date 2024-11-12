@@ -125,6 +125,7 @@ func (x *XfYunServer) Chat(requestPath string, data []byte) (*Response, error) {
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Sid
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
@@ -261,6 +262,7 @@ func (x *XfYunServer) ChatStream(requestPath string, data []byte, msgCh chan str
 		msgCh <- retStruct.Choices[0].Delta.Content
 
 		if retStruct.Usage.TotalTokens > 0 {
+			ret.RequestId = retStruct.Sid
 			ret.PromptTokens = retStruct.Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Usage.CompletionTokens
 			close(msgCh)

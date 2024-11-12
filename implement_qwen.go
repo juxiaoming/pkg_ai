@@ -132,6 +132,7 @@ func (q *QwenServer) Chat(requestPath string, data []byte) (*Response, error) {
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Id
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
@@ -246,6 +247,7 @@ func (q *QwenServer) ChatStream(requestPath string, data []byte, msgCh chan stri
 		}
 
 		if retStruct.Usage.TotalTokens > 0 {
+			ret.RequestId = retStruct.Id
 			ret.PromptTokens = retStruct.Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Usage.CompletionTokens
 		}

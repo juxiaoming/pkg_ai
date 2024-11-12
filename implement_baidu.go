@@ -197,6 +197,7 @@ func (b *BaiDuServer) Chat(requestPath string, data []byte) (*Response, error) {
 		return ret, errors.New(retStruct.ErrorMsg)
 	}
 
+	ret.RequestId = retStruct.Id
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
@@ -296,6 +297,7 @@ func (b *BaiDuServer) ChatStream(requestPath string, data []byte, msgCh chan str
 		}
 
 		if retStruct.IsEnd {
+			ret.RequestId = retStruct.Id
 			ret.PromptTokens = retStruct.Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Usage.CompletionTokens
 			close(msgCh)

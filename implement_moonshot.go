@@ -141,6 +141,7 @@ func (m *MoonshotServer) Chat(requestPath string, data []byte) (*Response, error
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Id
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
@@ -206,7 +207,6 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 		line = bytes.TrimSuffix(line, []byte("\n"))
 
 		if err != nil {
-
 			if errors.Is(err, io.EOF) {
 				resErr := err
 				errStruct := &MoonshotErrorInfo{}
@@ -249,6 +249,7 @@ func (m *MoonshotServer) ChatStream(requestPath string, data []byte, msgCh chan 
 		msgCh <- retStruct.Choices[0].Delta.Content
 
 		if retStruct.Choices[0].FinishReason == "stop" {
+			ret.RequestId = retStruct.Id
 			ret.PromptTokens = retStruct.Choices[0].Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Choices[0].Usage.CompletionTokens
 			close(msgCh)

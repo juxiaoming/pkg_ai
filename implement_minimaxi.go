@@ -134,6 +134,7 @@ func (m *MinimaxiServer) Chat(requestPath string, data []byte) (*Response, error
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Id
 	ret.CompletionTokens = retStruct.Usage.TotalTokens
 
 	if retStruct.BaseResp.StatusCode != 0 {
@@ -264,6 +265,7 @@ func (m *MinimaxiServer) ChatStream(requestPath string, data []byte, msgCh chan 
 		}
 
 		if retStruct.Usage.TotalTokens > 0 {
+			ret.RequestId = retStruct.Id
 			ret.CompletionTokens = retStruct.Usage.TotalTokens
 			close(msgCh)
 			break

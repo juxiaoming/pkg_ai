@@ -126,6 +126,7 @@ func (g *GlmServer) Chat(requestPath string, data []byte) (*Response, error) {
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Id
 	ret.PromptTokens = retStruct.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Usage.CompletionTokens
 
@@ -244,6 +245,7 @@ func (g *GlmServer) ChatStream(requestPath string, data []byte, msgCh chan strin
 		msgCh <- retStruct.Choices[0].Delta.Content
 
 		if retStruct.Choices[0].FinishReason == "stop" {
+			ret.RequestId = retStruct.Id
 			ret.PromptTokens = retStruct.Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Usage.CompletionTokens
 			close(msgCh)

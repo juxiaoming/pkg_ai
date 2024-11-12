@@ -148,6 +148,7 @@ func (s *SensenovaServer) Chat(requestPath string, data []byte) (*Response, erro
 		return ret, err
 	}
 
+	ret.RequestId = retStruct.Data.Id
 	ret.PromptTokens = retStruct.Data.Usage.PromptTokens
 	ret.CompletionTokens = retStruct.Data.Usage.CompletionTokens
 
@@ -282,6 +283,7 @@ func (s *SensenovaServer) ChatStream(requestPath string, data []byte, msgCh chan
 		msgCh <- retStruct.Data.Choices[0].Delta
 
 		if retStruct.Data.Choices[0].FinishReason == "stop" {
+			ret.RequestId = retStruct.Data.Id
 			ret.PromptTokens = retStruct.Data.Usage.PromptTokens
 			ret.CompletionTokens = retStruct.Data.Usage.CompletionTokens
 			close(msgCh)
