@@ -2,10 +2,12 @@ package pkg_ai
 
 import (
 	"errors"
+	"sync"
 	"time"
 )
 
 var (
+	once    sync.Once
 	config  Config // 全局配置
 	hasInit bool   // 配置是否初始化
 )
@@ -72,13 +74,14 @@ type Ability interface {
 }
 
 func Init(conf *Config, options ...Options) {
-
 	for _, option := range options {
 		option.Apply(conf)
 	}
 
-	config = *conf
-	hasInit = true
+	once.Do(func() {
+		config = *conf
+		hasInit = true
+	})
 }
 
 type Server struct {
