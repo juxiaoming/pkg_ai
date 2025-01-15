@@ -36,6 +36,8 @@ type Config struct {
 	SensenovaUrl          string `json:"sensenova_url"`
 	SensenovaClientId     string `json:"sensenova_client_id"`
 	SensenovaClientSecret string `json:"sensenova_client_secret"`
+	DeepSeekUrl           string `json:"deep_seek_url"`
+	DeepSeekKey           string `json:"deep_seek_key"`
 }
 
 type RequestData struct {
@@ -102,6 +104,7 @@ const (
 	ImplementSensenova int8 = 10 // 商汤日日新
 	ImplementChatGpt   int8 = 11 // chatGpt
 	ImplementGemini    int8 = 12 // gemini
+	ImplementDeepSeek  int8 = 13 // deepSeek
 )
 
 var (
@@ -187,6 +190,13 @@ func NewServer(implementId int8) (*Server, error) {
 		}
 
 		client = newSensenovaServer(config.SensenovaUrl, config.SensenovaClientId, config.SensenovaClientSecret)
+
+	case ImplementDeepSeek:
+		if len(config.DeepSeekUrl) == 0 || len(config.DeepSeekKey) == 0 {
+			return nil, ErrorNoConfig
+		}
+
+		client = newDeepSeekServer(config.DeepSeekUrl, config.DeepSeekKey)
 
 	default:
 		return nil, ErrorNoImplement

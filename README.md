@@ -69,6 +69,12 @@ go get github.com/juxiaoming/pkg_ai
         <td><a target="_blank" href="https://console.sensecore.cn/iam/Security/access-key">应用申请</a></td>
     </tr>
     <tr>
+        <td><img src="./logo/deepseek.png" height="30" title="deepSeek"></td>
+        <td>deepSeek</td>
+        <td><a target="_blank" href="https://api-docs.deepseek.com/zh-cn/">参考文档</a></td>
+        <td><a target="_blank" href="https://platform.deepseek.com/api_keys">应用申请</a></td>
+    </tr>
+    <tr>
         <td><img src="./logo/chatgpt.png" height="30" title="ChatGpt"></td>
         <td>( &#10008; )ChatGpt</td>
         <td><a target="_blank" href="https://platform.openai.com/docs/overview">参考文档</a></td>
